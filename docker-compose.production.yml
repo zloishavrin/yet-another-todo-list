@@ -1,0 +1,33 @@
+services:
+  mongodb:
+    image: mongo
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: production.Dockerfile
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo
+    env_file:
+      - ./.env
+    container_name: backend
+    command: "npm run start:prod"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: production.Dockerfile
+    ports:
+      - "80:80"
+    container_name: frontend
+
+networks:
+  app-network:
+    driver: bridge
