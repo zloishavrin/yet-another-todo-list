@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { MongooseModule } from '@nestjs/mongoose';
+import { ArticleController } from './article.controller';
+import { ArticleService } from './article.service';
 import { User, UserSchema } from '@db/user.schema';
+import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
+import { Article, ArticleSchema } from '@db/article.schema';
 
 @Module({
   imports: [
@@ -11,6 +12,10 @@ import { JwtModule } from '@nestjs/jwt';
       {
         name: User.name,
         schema: UserSchema,
+      },
+      {
+        name: Article.name,
+        schema: ArticleSchema,
       },
     ]),
     JwtModule.register({
@@ -20,7 +25,7 @@ import { JwtModule } from '@nestjs/jwt';
       },
     }),
   ],
-  controllers: [AuthController],
-  providers: [AuthService],
+  controllers: [ArticleController],
+  providers: [ArticleService],
 })
-export class AuthModule {}
+export class ArticleModule {}
