@@ -1,5 +1,170 @@
 # yet-another-todo-list
 
+[Kanban Board](https://github.com/users/zloishavrin/projects/4/views/1)
+
+## Требования к проекту
+
+### Git
+
+Разработка ведется с использованием GIT (система контроля версия) и GitHub (удаленный репозиторий).
+
+Подробнее ветвление можно посмотреть [здесь](https://github.com/zloishavrin/yet-another-todo-list/network).
+
+### Docker
+
+Настроены два варианта развертывания платформы с помощью Docker - в DEV и PROD режимах.
+
+Также настроен Docker Build Test с помощью GitHub Actions.
+
+### IDE и отладка
+
+На проекте используется VS Code для разработки. Для форматирования кода применяются Prettier и ESLint.
+
+### Agile, Scrum, Kanban
+
+Все задачи по проекту фиксируются здесь - [Kanban Board](https://github.com/users/zloishavrin/projects/4/views/1)
+
+### ООП
+
+На бэкэнде применяется архитектурный фреймворк NestJS для TypeScript, который завязан на ООП.
+
+#### Инкапсуляция
+
+Инкапсуляция в NestJS достигается за счет классов, методов и зависимостей, которые управляют своей логикой и данными, не раскрывая внутреннюю реализацию. Например:
+
+Контроллер:
+```typescript
+export class ArticleController {
+  constructor(private ArticleService: ArticleService) {}
+}
+```
+* Контроллер инкапсулирует логику работы с HTTP-запросами. Вся бизнес-логика скрыта в ArticleService, а контроллер отвечает только за маршрутизацию и вызов соответствующих методов.
+* Зависимость ArticleService инжектируется через конструктор, скрывая реализацию от контроллера.
+
+Сервис:
+```typescript
+export class ArticleService {
+  constructor(
+    @InjectModel(User.name) private UserModel: Model<User>,
+    @InjectModel(Article.name) private ArticleModel: Model<Article>,
+  ) {}
+}
+```
+* Сервис инкапсулирует бизнес-логику работы с данными (например, создание статьи). Внешний код не знает, как данные сохраняются в базе или как модели взаимодействуют друг с другом.
+
+#### Абстракция
+
+NestJS позволяет скрывать сложность реализации через использование интерфейсов, декораторов и зависимостей. Например:
+
+Встроенный декоратор, в который передается класс AuthGuard с реализацией проверки аутентификации с помощью JWT-токенов:
+```typescript
+@UseGuards(AuthGuard)
+```
+* Абстрагирует проверку аутентификации. Контроллеру не нужно знать, как работает AuthGuard — он просто доверяет, что пользователь будет аутентифицирован.
+
+Или валидация:
+```typescript
+@UsePipes(new ValidationPipe())
+```
+* Инкапсулирует валидацию данных запроса. Контроллеру не нужно заботиться о проверке каждого поля — это делается пайпом.
+
+### Инверсия управления
+
+Используется механизм dependency injection (DI), что является реализацией принципа инверсии управления (IoC). Это позволяет избегать жесткой привязки к конкретным реализациям классов и облегчает тестирование. Пример:
+```typescript
+constructor(private ArticleService: ArticleService) {}
+```
+* ArticleService инжектируется в контроллер автоматически благодаря DI контейнеру NestJS.
+* Реализация ArticleService может быть легко заменена, например, на мок-объект для тестирования.
+
+### Паттерны проектирования
+
+#### Внедрение зависимостей
+
+```typescript
+@Controller('api/article')
+export class ArticleController {
+  constructor(private ArticleService: ArticleService) {}
+}
+```
+* Контроллер получает ArticleService, который создается и управляется IoC-контейнером NestJS. Это упрощает тестирование и замену зависимостей.
+
+#### Многослойная архитектура
+
+Проект следует слоистой архитектуре, разделяя проект на контроллеры, сервисы и репозитории. Каждый слой выполняет строго определенную задачу:
+
+* Контроллеры управляют HTTP-запросами.
+* Сервисы содержат бизнес-логику.
+* Репозитории работают с базой данных (используется ODM Mongoose).
+
+#### Singletone
+
+Все сервисы в NestJS по умолчанию являются синглтонами, т.е. создаются один раз и переиспользуются во всех местах, где они инжектируются.
+
+Пример:
+```typescript
+@Injectable()
+export class ArticleService {
+  constructor(private readonly ArticleModel: Model<Article>) {}
+}
+```
+
+#### Фабрика
+
+```typescript
+@Module({
+  imports: [
+    MongooseModule.forRoot(
+      `mongodb://${process.env.MONGO_ROOT_USER}:${process.env.MONGO_ROOT_PASSWORD}@mongodb:27017/yatl?authSource=admin`,
+    ),
+    AuthModule,
+    ArticleModule,
+    UserModule,
+    StorageModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+```
+
+В данном примере используется фабричный подход при настройке подключения к *MongoDB* с помощью *MongooseModule.forRoot*.
+
+Метод *forRoot* в *MongooseModule* является фабричным методом, который возвращает предварительно настроенный провайдер для подключения к базе данных.
+
+#### Репозиторий
+
+Паттерн используется для абстрагирования работы с базой данных. Вместо прямого взаимодействия с моделью, данные обрабатываются через слой репозитория:
+```typescript
+@Injectable()
+export class ArticleService {
+  constructor(
+    @InjectModel(Article.name) private ArticleModel: Model<Article>,
+  ) {}
+
+  async findArticlesByUser(userId: string) {
+    return this.ArticleModel.find({ owner: userId }).exec();
+  }
+}
+```
+
+#### Декоратор
+
+NestJS построен на паттерне **Декоратор**:
+```typescript
+@UseGuards(AuthGuard)
+@Put('new')
+async newArticle(@Body() article: ArticleRequestDto, @UserId() userId: string) {
+  // ...
+}
+```
+
+### Тестирование
+
+На бэкэнде присутствуют юнит-тесты для модулей работы пользователями, аутентификацией и записями, а также интеграционные тесты.
+
+С помощью GitHub Actions настроено автоматическое тестирование при попадании изменений в **master**.
+
 ## Запуск проекта в DEV-режиме
 
 В dev-режиме фронтенд запускается отдельно от других сервисов. Для того, чтобы запустить фронтенд необходимо прописать следующее в директории фронтенда:
@@ -21,9 +186,9 @@ docker-compose up --build
 localhost/api/test
 ```
 
-Также запускается автодокументация по пути:
+Также запускается автодокументация (swagger) по пути:
 ```
-localhost/api/api
+localhost/api/docs
 ```
 
 ## Запуск проекта в PROD-режиме
