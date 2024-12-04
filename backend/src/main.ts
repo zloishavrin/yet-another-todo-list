@@ -10,7 +10,7 @@ async function bootstrap() {
   app.enableCors({
     origin: '*',
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   });
 
   const swaggerConfig = new DocumentBuilder()
@@ -22,9 +22,9 @@ async function bootstrap() {
       description: 'Аутентификация по JWT-токену',
       name: 'authorization',
       in: 'header',
-      bearerFormat: 'JWT'
+      bearerFormat: 'JWT',
     })
-    .build()
+    .build();
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, swaggerDocument);
 

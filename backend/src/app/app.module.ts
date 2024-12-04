@@ -9,11 +9,13 @@ import { StorageModule } from '../storage/storage.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(`mongodb://${process.env.MONGO_ROOT_USER}:${process.env.MONGO_ROOT_PASSWORD}@mongodb:27017/yatl?authSource=admin`),
+    MongooseModule.forRoot(
+      `mongodb://${process.env.MONGO_ROOT_USER}:${process.env.MONGO_ROOT_PASSWORD}@mongodb:27017/yatl?authSource=admin`,
+    ),
     AuthModule,
     ArticleModule,
     UserModule,
-    StorageModule
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,11 @@
-import { Controller, Get, Param, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { UserService } from './user.service';
@@ -9,22 +16,20 @@ import { UserId } from 'src/auth/auth.decorator';
 @Controller('/api/user')
 @UseGuards(AuthGuard)
 export class UserController {
-
-  constructor(
-    private UserService: UserService
-  ) {}
+  constructor(private UserService: UserService) {}
 
   @Get('current/:id')
-  @ApiOperation({ summary: 'Получение пользователя по ID (если нужен свой пользователь, то лучше метод user/me)' })
+  @ApiOperation({
+    summary:
+      'Получение пользователя по ID (если нужен свой пользователь, то лучше метод user/me)',
+  })
   @ApiResponse({
     status: 200,
     description: 'Объект пользователя',
-    type: UserResponseDto
+    type: UserResponseDto,
   })
   @UsePipes(new ValidationPipe())
-  async getCurrentUser(
-    @Param('id') id: string
-  ) : Promise <UserResponseDto> {
+  async getCurrentUser(@Param('id') id: string): Promise<UserResponseDto> {
     const user = await this.UserService.getCurrentUser(id);
     return user;
   }
@@ -34,11 +39,9 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Объект пользователя',
-    type: UserResponseDto
+    type: UserResponseDto,
   })
-  async getMeUser(
-    @UserId() userId : string
-  ) : Promise<UserResponseDto> {
+  async getMeUser(@UserId() userId: string): Promise<UserResponseDto> {
     const user = await this.UserService.getCurrentUser(userId);
     return user;
   }
@@ -48,11 +51,10 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Массив объектов пользователей',
-    type: [UserResponseDto]
+    type: [UserResponseDto],
   })
-  async getAllUsers() : Promise<UserResponseDto[]> {
+  async getAllUsers(): Promise<UserResponseDto[]> {
     const users = await this.UserService.getAllUsers();
     return users;
   }
-
 }
