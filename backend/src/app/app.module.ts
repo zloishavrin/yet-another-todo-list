@@ -6,10 +6,11 @@ import { ArticleModule } from '../article/article.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from '../user/user.module';
 import { StorageModule } from '../storage/storage.module';
+import { rootMongooseTestModule } from '../../e2e-test/test-db.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(
+    process.env.NODE_ENV === 'test' ? rootMongooseTestModule() : MongooseModule.forRoot(
       `mongodb://${process.env.MONGO_ROOT_USER}:${process.env.MONGO_ROOT_PASSWORD}@mongodb:27017/yatl?authSource=admin`,
     ),
     AuthModule,
