@@ -3,10 +3,14 @@ name: Docker-Compose Build Test
 on:
   push:
     branches:
+      - backend
       - master
+      - git-workflows
   pull_request:
     branches:
+      - backend
       - master
+      - git-workflows
 
 jobs:
   docker-build-test:
