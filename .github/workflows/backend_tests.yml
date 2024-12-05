@@ -1,0 +1,41 @@
+name: Run Backend Tests
+
+on:
+  push:
+    branches:
+      - backend
+      - master
+      - git-workflows
+  pull_request:
+    branches:
+      - backend
+      - master
+      - git-workflows
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: cd backend && npm install
+
+      - name: Build the application
+        run: cd backend && npm run build
+
+      - name: Run Unit Tests
+        run: cd backend && npm run test
+
+      - name: Run E2E Tests
+        run: cd backend && npm run test:e2e
+
+      - name: Run Coverage Tests
+        run: cd backend && npm run test:cov

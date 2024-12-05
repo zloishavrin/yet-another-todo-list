@@ -1,96 +1,114 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from '../auth.service';
 import { JwtService } from '@nestjs/jwt';
-import { Model } from 'mongoose';
 import { getModelToken } from '@nestjs/mongoose';
-import * as bcrypt from 'bcryptjs';
+import { Model } from 'mongoose';
 import { User } from '@db/user.schema';
 import { BadRequestException } from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
 
-// Мокаем зависимости
-const mockJwtService = {
-  sign: jest.fn().mockReturnValue('mockJwtToken'),
-};
-
-const mockUserModel = {
-  findOne: jest.fn(),
-  create: jest.fn(),
-};
+jest.mock('bcryptjs', () => ({
+  compare: jest.fn(),
+  hash: jest.fn(),
+}));
 
 describe('AuthService', () => {
-  let service: AuthService;
+  let authService: AuthService;
   let jwtService: JwtService;
   let userModel: Model<User>;
 
   beforeEach(async () => {
+    const mockJwtService = {
+      sign: jest.fn().mockReturnValue('mockToken'),
+    };
+    const mockUserModel = {
+      findOne: jest.fn(),
+      create: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
-        {
-          provide: JwtService,
-          useValue: mockJwtService,
-        },
-        {
-          provide: getModelToken(User.name),
-          useValue: mockUserModel,
-        },
+        { provide: JwtService, useValue: mockJwtService },
+        { provide: getModelToken(User.name), useValue: mockUserModel },
       ],
     }).compile();
 
-    service = module.get<AuthService>(AuthService);
+    authService = module.get<AuthService>(AuthService);
     jwtService = module.get<JwtService>(JwtService);
     userModel = module.get<Model<User>>(getModelToken(User.name));
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  it('Контроллер определен', () => {
+    expect(authService).toBeDefined();
   });
 
   describe('registration', () => {
-    it('should create a new user and return a user object with token', async () => {
-      // Arrange
-      const mockUser: User = { login: 'login123', password: 'password123' };
-      const hashedPassword = 'hashedPassword123';
-      const mockCreatedUser = { _id: '12345', login: 'login123', password: hashedPassword };
-      const mockResponse = {
-        _id: '12345',
-        login: 'login123',
-        token: 'mockJwtToken',
-      };
+    it('Ошибка, если пользователь уже существует', async () => {
+      const userDto = { login: 'test', password: 'password123' };
 
-      // Мокаем методы
-      bcrypt.hash = jest.fn().mockResolvedValue(hashedPassword);
-      mockUserModel.findOne.mockResolvedValue(null); // Нет пользователя с таким логином
-      mockUserModel.create.mockResolvedValue(mockCreatedUser);
-      mockJwtService.sign.mockReturnValue('mockJwtToken');
+      userModel.findOne = jest.fn().mockResolvedValue({ login: 'test' });
 
-      // Act
-      const result = await service.registration(mockUser);
-
-      // Assert
-      expect(result).toEqual(mockResponse);
-      expect(mockUserModel.create).toHaveBeenCalledWith({
-        login: mockUser.login,
-        password: hashedPassword,
-      });
-      expect(bcrypt.hash).toHaveBeenCalledWith(mockUser.password, 10);
-      expect(mockJwtService.sign).toHaveBeenCalledWith({ sub: mockCreatedUser._id });
+      await expect(authService.registration(userDto)).rejects.toThrowError(
+        new BadRequestException(['Пользователь с таким логином уже существует']),
+      );
     });
 
-    it('should throw BadRequestException if user with the same login exists', async () => {
-      // Arrange
-      const mockUser: User = { login: 'login123', password: 'password123' };
-      const existingUser = { login: 'login123', password: 'hashedPassword123' };
+    it('Должен создать пользователя и вернуть его объект с токеном', async () => {
+      const userDto = { login: 'test', password: 'password123' };
+      const createdUser = { _id: '12345', login: 'test', password: 'hashedPassword' };
+      const hashedPassword = await bcrypt.hash(userDto.password, 3);
 
-      mockUserModel.findOne.mockResolvedValue(existingUser); // Пользователь уже существует
+      userModel.findOne = jest.fn().mockResolvedValue(null);
+      userModel.create = jest.fn().mockResolvedValue({ ...createdUser, password: hashedPassword });
 
-      // Act & Assert
-      await expect(service.registration(mockUser)).rejects.toThrow(
-        BadRequestException,
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      const result = await authService.registration(userDto);
+
+      expect(result).toHaveProperty('_id');
+      expect(result).toHaveProperty('login');
+      expect(result).toHaveProperty('token');
+      expect(jwtService.sign).toHaveBeenCalledWith({ sub: createdUser._id });
+    });
+  });
+
+  describe('login', () => {
+    it('Ошибка, если пользователь не найден', async () => {
+      const userDto = { login: 'test', password: 'password123' };
+
+      userModel.findOne = jest.fn().mockResolvedValue(null);
+
+      await expect(authService.login(userDto)).rejects.toThrowError(
+        new BadRequestException(['Пользователь с таким логином не найден']),
       );
-      await expect(service.registration(mockUser)).rejects.toThrow(
-        'Пользователь с таким логином уже существует',
+    });
+
+    it('Ошибка, если пароль неверный', async () => {
+      const userDto = { login: 'test', password: 'password123' };
+      const existingUser = { login: 'test', password: 'hashedPassword' };
+
+      userModel.findOne = jest.fn().mockResolvedValue(existingUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      await expect(authService.login(userDto)).rejects.toThrowError(
+        new BadRequestException(['Неверный пароль']),
       );
+    });
+
+    it('Должен вернуть объект пользователя с токеном', async () => {
+      const userDto = { login: 'test', password: 'password123' };
+      const existingUser = { _id: '12345', login: 'test', password: 'hashedPassword' };
+
+      userModel.findOne = jest.fn().mockResolvedValue(existingUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      const result = await authService.login(userDto);
+
+      expect(result).toHaveProperty('_id');
+      expect(result).toHaveProperty('login');
+      expect(result).toHaveProperty('token');
+      expect(jwtService.sign).toHaveBeenCalledWith({ sub: existingUser._id });
     });
   });
 });
