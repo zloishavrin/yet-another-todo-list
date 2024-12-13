@@ -1,0 +1,9 @@
+.authFormContainer {
+  width: 30vw;
+}
+
+@media(max-width: 1000px) {
+  .authFormContainer {
+    width: 80vw;
+  }
+}
