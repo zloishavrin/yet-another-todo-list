@@ -73,8 +73,8 @@ export const Registration = () => {
               errorMessage="Введите корректный логин"
               labelPlacement="outside"
               name="login"
-              placeholder="Введите логин"
               description="От 5 до 64 символов"
+              variant="bordered"
             />
             <Input
               isRequired
@@ -85,8 +85,8 @@ export const Registration = () => {
               errorMessage="Введите корректный пароль"
               labelPlacement="outside"
               name="password"
-              placeholder="Введите пароль"
               description="От 5 до 64 символов"
+              variant="bordered"
             />
             <Input
               isRequired
@@ -97,8 +97,8 @@ export const Registration = () => {
               errorMessage="Введите корректный пароль"
               labelPlacement="outside"
               name="password2"
-              placeholder="Введите пароль еще раз"
               description="От 5 до 64 символов"
+              variant="bordered"
             />
             <div className="flex gap-4">
               <Button
@@ -119,7 +119,7 @@ export const Registration = () => {
               as={Link}
               href="/login"
               showAnchorIcon
-              variant="flat"
+              variant="bordered"
             >
               Назад
             </Button>

@@ -64,8 +64,8 @@ export const Auth = () => {
               errorMessage="Введите корректный логин"
               labelPlacement="outside"
               name="login"
-              placeholder="Введите логин"
               description="От 5 до 64 символов"
+              variant="bordered"
             />
             <Input
               isRequired
@@ -76,8 +76,8 @@ export const Auth = () => {
               errorMessage="Введите корректный пароль"
               labelPlacement="outside"
               name="password"
-              placeholder="Введите пароль"
               description="От 5 до 64 символов"
+              variant="bordered"
             />
             <div className="flex gap-4">
               <Button

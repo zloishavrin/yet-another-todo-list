@@ -1,0 +1,23 @@
+.docsContainer {
+  background-color: black;
+  position: fixed;
+  z-index: 0;
+  right: 0;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+.docsLeft {
+  bottom: 40%;
+  left: 20%;
+  position: absolute;
+  filter: blur(100px);
+}
+
+.docsRight {
+  bottom: -50%;
+  right: 50%;
+  position: absolute;
+  filter: blur(100px);
+}
