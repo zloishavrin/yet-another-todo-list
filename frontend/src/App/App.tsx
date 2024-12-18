@@ -10,6 +10,7 @@ import DocsRightImage from "../assets/docs-right.png";
 import styles from "./App.module.css";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
+import { Main } from "../Page/Main/Main";
 
 declare module "@react-types/shared" {
   interface RouterConfig {
@@ -55,7 +56,7 @@ function App() {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                     >
-                      <div>Главная Страница</div>
+                      <Main />
                     </motion.div>
                   ) : (
                     <motion.div

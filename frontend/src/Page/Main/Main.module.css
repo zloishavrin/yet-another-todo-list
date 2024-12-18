@@ -1,0 +1,173 @@
+.MainContainer {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.Main {
+  width: 80%;
+  margin-top: 5vw;
+  padding-bottom: 20vh;
+}
+
+.Header {
+  display: flex;
+  font-weight: bold;
+  font-size: 1.25rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ArticleContainer {
+  margin-top: 5vw;
+  display: flex;
+  gap: 2vw 5vw;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.Card {
+  cursor: pointer;
+  width: 16.25vw;
+  max-height: 22vw;
+  overflow-y: hidden;
+}
+
+.Card:hover {
+  transform: scale(0.95);
+}
+
+.CardBody {
+  overflow-y: hidden;
+}
+
+.CardBody p {
+  max-height: 7.2rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: wrap;
+  font-weight: 300;
+}
+
+.CardBodyAdd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+.SVGContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.SVGContainer svg {
+  width: 70%;
+  height: 70%;
+}
+
+.CardImage {
+  width: 15vw;
+  max-height: 15vw;
+  object-fit: cover;
+  object-position: center;
+}
+
+.CardHeader {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.CardHeaderTitle {
+  font-weight: bold;
+}
+
+.CardHeaderStatus {
+  font-size: 0.9rem;
+}
+
+.primaryColor {
+  color: hsl(var(--nextui-primary));
+}
+
+.successColor {
+  color: hsl(var(--nextui-success));
+}
+
+.NewArticleButton {
+  width: 16.25vw;
+  height: 23vw;
+  border: dashed 2px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease-out;
+}
+
+.NewArticleButton:hover {
+  opacity: 0.6;
+}
+
+.Modal {
+  z-index: 99999;
+}
+
+.FileUploader {
+  width: 100%;
+  height: 5rem;
+  border: dashed 0.15rem #e5e7eb;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: hsl(var(--nextui-default-100) / var(--nextui-default-100-opacity, var(--tw-bg-opacity)))
+}
+
+.AlertContainer {
+  position: fixed;
+  right: 1vw;
+  bottom: 1vw;
+  z-index: 9999999;
+}
+
+.ArticleElementContainer {
+  width: 30vw;
+  padding: 2vw 1vw;
+}
+
+.ArticleTitle {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1vw;
+}
+
+.ArticleStatus {
+  margin: 0.25vw 0vw;
+  font-size: 0.8rem;
+}
+
+.ArticleDate {
+  margin: 0.25vw 0vw;
+  font-size: 0.8rem;
+}
+
+.ArticleDescription {
+  margin-top: 1vw;
+  font-size: 1rem;
+}
+
+.ArticleImage {
+  margin-top: 0.5vw;
+  width: 100%;
+  height: auto;
+}

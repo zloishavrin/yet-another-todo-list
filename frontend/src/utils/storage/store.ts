@@ -3,9 +3,9 @@ import APIService from '../api/service';
 
 export default class Store {
 
-    token = localStorage.getItem('token');
-    isAuth = this.token ? true : false;
-    isLoading = false;
+    token : string | null = localStorage.getItem('token');
+    isAuth : boolean = this.token ? true : false;
+    isLoading : boolean = false;
 
     constructor() {
         makeAutoObservable(this);
@@ -15,7 +15,7 @@ export default class Store {
         this.isAuth = bool;
     }
 
-    setToken(token: string) {
+    setToken(token: string | null) {
         this.token = token;
     }
 
@@ -30,6 +30,22 @@ export default class Store {
             localStorage.setItem('token', responce.data.token);
             this.setToken(responce.data.token);
             this.setAuth(true);
+        }
+        catch(error) {
+            this.setAuth(false);
+            return Promise.reject(error);
+        }
+        finally {
+            this.setLoading(false);
+        }
+    }
+
+    async logout() {
+        this.setLoading(true)
+        try {
+            localStorage.removeItem('token');
+            this.setToken(null);
+            this.setAuth(false);
         }
         catch(error) {
             this.setAuth(false);
