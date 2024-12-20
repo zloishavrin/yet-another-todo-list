@@ -1,0 +1,9 @@
+.registrationFormContainer {
+  width: 30vw;
+}
+
+@media(max-width: 1000px) {
+  .registrationFormContainer {
+    width: 80vw;
+  }
+}
