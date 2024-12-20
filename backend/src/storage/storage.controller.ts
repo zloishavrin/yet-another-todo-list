@@ -35,6 +35,9 @@ export class StorageController {
           callback(null, `${uniqueFileName}_${file.originalname}`);
         },
       }),
+      limits: {
+        fileSize: 10 * 1024 * 1024,
+      }
     }),
   )
   upload(@UploadedFile() file: Express.Multer.File): StorageResponseDto {

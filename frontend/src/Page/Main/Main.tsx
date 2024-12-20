@@ -30,6 +30,7 @@ import { useNavigate } from "react-router-dom";
 import { FileUploader } from "react-drag-drop-files";
 import APIService from "../../utils/api/service";
 import { ExitIcon } from "../../Components/ExitIcon";
+import { UploadIcon } from "../../Components/UploadIcon";
 
 interface IArticle {
   title: string,
@@ -250,7 +251,7 @@ export const Main = () => {
                         hoverTitle="Загрузить изображение"
                       >
                         <div className={styles.FileUploader}>
-
+                          <UploadIcon />
                         </div>
                       </FileUploader> 
                       ) : (

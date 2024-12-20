@@ -26,7 +26,7 @@ export class ArticleEditRequestDto {
   })
   @IsOptional()
   @MinLength(5)
-  @MaxLength(64)
+  @MaxLength(256)
   description: string | null;
 
   @ApiPropertyOptional({
@@ -53,7 +53,7 @@ export class ArticleRequestDto {
   })
   @IsNotEmpty()
   @MinLength(5)
-  @MaxLength(64)
+  @MaxLength(256)
   description: string;
 
   @ApiPropertyOptional({
@@ -94,7 +94,7 @@ export class ArticleResponseDto {
   })
   @IsNotEmpty()
   @MinLength(5)
-  @MaxLength(64)
+  @MaxLength(256)
   description: string;
 
   @ApiPropertyOptional({

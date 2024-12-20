@@ -113,7 +113,7 @@ export class ArticleService {
   }
 
   async getAllArticles(userId: string): Promise<ArticleResponseDto[]> {
-    const articles = await this.ArticleModel.find({ owner: userId });
+    const articles = await this.ArticleModel.find({ owner: userId }).sort({ createdAt: -1 });
     const articlesObject = articles.map((article) => {
       return {
         _id: article._id,
