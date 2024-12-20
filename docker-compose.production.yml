@@ -1,33 +1,54 @@
 services:
   mongodb:
     image: mongo
+    restart: always
     volumes:
       - mongo-data:/data/db
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
 
+  mongo-express:
+    image: mongo-express
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+      - ME_CONFIG_MONGODB_AUTH_USERNAME=${MONGO_ROOT_USER}
+      - ME_CONFIG_MONGODB_AUTH_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - ME_CONFIG_BASICAUTH_USERNAME=${MONGOEXPRESS_LOGIN}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${MONGOEXPRESS_PASSWORD}
+    depends_on:
+      - mongodb
+    ports:
+      - "8888:8081"
+
   backend:
     build:
       context: ./backend
-      dockerfile: production.Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "3001:3001"
     depends_on:
-      - mongo
+      - mongodb
+    volumes:
+      - ./backend:/usr/src/backend
+      - /usr/src/backend/node_modules
     env_file:
       - ./.env
-    container_name: backend
-    command: "npm run start:prod"
+    command: npm run start
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: production.Dockerfile
+  nginx:
+    image: nginx:latest
+    container_name: nginx
     ports:
       - "80:80"
-    container_name: frontend
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend/dist:/etc/nginx/html
+    depends_on:
+      - backend
 
-networks:
-  app-network:
-    driver: bridge
+volumes:
+  mongo-data:
