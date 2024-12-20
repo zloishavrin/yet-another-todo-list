@@ -133,6 +133,17 @@
   background-color: hsl(var(--nextui-default-100) / var(--nextui-default-100-opacity, var(--tw-bg-opacity)))
 }
 
+.FileUploader svg {
+  width: 2vw;
+  height: 2vw;
+  transition: all 0.2s ease-out;
+}
+
+.FileUploader:hover svg {
+  opacity: 0.8;
+  transform: scale(0.8);
+}
+
 .AlertContainer {
   position: fixed;
   right: 1vw;
